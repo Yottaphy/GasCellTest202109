@@ -100,7 +100,7 @@ fwhm = (fv+midpoint)*c
 fwhmerr = errf*c
 
 f = open("results/stats.txt", "a")
-f.write(in1.strip('gascell.csv').replace('_',' ').replace('1step', '1$^{st}$ step').replace('2step', '2^{nd} step') + '\t' + str(vfit[0]) + '\t' + str(sqrt(verr[0][0])) + '\t' + str(mean) + '\t' + str(meanerr) + '\t' + str(fwhm) + '\t' + str(fwhmerr) + '\n')
+f.write(in1[0]+in1[1]+in1[2] + '\t\t\t\t\t\t' + str(vfit[0]) + '\t' + str(sqrt(verr[0][0])) + '\t' + str(mean) + '\t' + str(meanerr) + '\t' + str(fwhm) + '\t' + str(fwhmerr) + '\n')
 #save plot as a pdf (vector images are superior, change my mind) with transparency
 plt.savefig("results/"+finalname+".pdf", bbox_inches = 'tight', pad_inches = 0.1, transparent=True)
 plt.savefig("results/"+finalname+".png", bbox_inches = 'tight', pad_inches = 0.1)
