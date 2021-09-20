@@ -1,6 +1,7 @@
 import numpy as np
 from numpy.lib.scimath import log, sqrt
 import scipy as sc
+from scipy.special import wofz
 import sys
 import csv
 from matplotlib.figure import Figure
@@ -16,12 +17,14 @@ def gaus(x, n0, mu, sigma):
     return n0*(1/sqrt(2*PI))*(1/sigma)*np.exp(-(x-mu)**2/(2*sigma**2))
 def lorentz(x, n0, mu, gamma):
     return n0*(PI*gamma*(1+((x-mu)/gamma)**2))**(-1)
-def voigt(x, n, mu, sigma, gamma):
+def voigta(x, n, mu, sigma, gamma):
     fg = 2*sigma*sqrt(2*log(2))
     fl = 2*gamma
     f = (fg**5 + 2.69269*fl*(fg**4) + 2.42843*(fg**3)*(fl**2) + 4.47163*(fg**2)*(fl**3) + 0.07842*fg*(fl**4) + fl**5)**(1/5)
     eta = 1.36603*(fl/f) - 0.47719*(fl/f)**2 + 0.11116*(fl/f)**3
     return eta*lorentz(x, n, mu, f) + (1-eta)*gaus(x, n, mu, f)
+def voigt(x, n, mu, sigma, gamma):
+    return n*np.real(wofz((x-mu+1j*gamma)/sigma/sqrt(2)))/sigma/sqrt(2*PI)
 
 
 #read the file and output the correct count array and plot limits    
@@ -50,7 +53,7 @@ plt.rcParams['font.size'] = 18
 minimum = waveno1.min()
 maximum = waveno1.max()
 
-midpoint = 0.5*(minimum+maximum)
+midpoint = 13085.683
 
 for i in range(len(waveno1)):
     waveno1[i] -= midpoint
@@ -62,6 +65,8 @@ for i in range(len(waveno1)):
 gfit, gerr = curve_fit(gaus, waveno1, counts1, p0 = [600, 0.05, 0.1])
 lfit, lerr = curve_fit(lorentz, waveno1, counts1, p0 = [600, 0.05, 0.1])
 vfit, verr = curve_fit(voigt, waveno1, counts1, p0 = [500, 0.05, 0.01, 0.1])
+# afit, aerr = curve_fit(voigta, waveno1, counts1, p0 = [500, 0.05, 0.01, 0.1])
+
 # print(waveno1)
 #more format for the plots
 #plt.yscale('log')
@@ -83,6 +88,7 @@ errf = sqrt((errg*fg/sq)**2 + (errl*(0.5346+(0.2166*fl/sq)))**2)
 print('f= ' + str(round(fv,6)) + ' ± ' + str(round(errf,6)))
 
 plt.plot(waveno1, voigt(waveno1, *vfit), '-', color= 'black', label = 'Voigt')
+# plt.plot(waveno1, voigta(waveno1, *afit), '--', color= 'orange', label = 'Voigt Approx')
 
 #plt.plot(waveno2, counts2, label=in2.strip('gascell.csv').replace('_',' ').replace('1step', '1$^{st}$ step').replace('2step', '2^{nd} step'))
 plt.title('Reference = '+str(midpoint))
@@ -100,7 +106,7 @@ fwhm = (fv+midpoint)*c
 fwhmerr = errf*c
 
 f = open("results/stats.txt", "a")
-f.write(in1[0]+in1[1]+in1[2] + '\t\t\t\t\t\t' + str(vfit[0]) + '\t' + str(sqrt(verr[0][0])) + '\t' + str(mean) + '\t' + str(meanerr) + '\t' + str(fwhm) + '\t' + str(fwhmerr) + '\n')
+f.write(in1[0]+in1[1]+in1[2] + '\t\t\t\t\t\t' + str(vfit[0]) + '\t' + str(sqrt(verr[0][0])) + '\t' + str(mean) + '\t' + str(meanerr) + '\t' + str(fwhm) + '\t' + str(fwhmerr) + '\t' + str(vfit[2])+ '\t' + str(verr[2][2]) + '\t' + str(vfit[3])+ '\t' + str(verr[3][3]) + '\n')
 #save plot as a pdf (vector images are superior, change my mind) with transparency
 plt.savefig("results/"+finalname+".pdf", bbox_inches = 'tight', pad_inches = 0.1, transparent=True)
 plt.savefig("results/"+finalname+".png", bbox_inches = 'tight', pad_inches = 0.1)
