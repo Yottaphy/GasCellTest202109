@@ -40,9 +40,6 @@ finalname = sys.argv[2]
 waveno1, counts1 = txtreader(in1)
 # waveno2, counts2 = txtreader(in2)
 
-#make a smooth array of times for the plot
-# smooth = np.arange(0.5*min(time),1.1*max(time))
-
 #define some nicer format for the plots
 plt.rcParams['font.size'] = 18
 
@@ -102,7 +99,7 @@ plt.legend(loc=2,fontsize= 'x-small')
 c = 29.9792458 #cm/ns
 mean = (vfit[1] + midpoint)*c
 meanerr = c*verr[1][1]
-fwhm = (fv+midpoint)*c
+fwhm = (fv)*c
 fwhmerr = errf*c
 
 f = open("results/stats.txt", "a")

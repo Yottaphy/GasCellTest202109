@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 
 PI = 3.14159265359
+c  = 29.9792458 #cm/ns
 
 def voigt(x, n, mu, sigma, gamma):
     return n*np.real(wofz((x-mu+1j*gamma)/sigma/sqrt(2)))/sigma/sqrt(2*PI)
@@ -25,30 +26,31 @@ def txtreader(filename):
 
 pres, n, nerr, mu, muerr, fwhm, fwhmerr, sigma, sigmaerr, gamma, gammaerr = txtreader("results/stats.txt")
 
-x = np.linspace(-.5,.5,10000)
+x = np.linspace(-2,.5,10000)
 midpoint = 13085.683
 
 plt.rcParams['font.size'] = 18
 
-for i in range(len(pres)):
-    mu[i] /= 29.9792458
-    mu[i] -= midpoint
-    muerr[i] /= 29.9792458
-    plt.plot(x, voigt(x, 1, mu[i], sigma[i], gamma[i]), '-', label = str(pres[i])+' mbar')
 
-plt.xlabel('Wavenumber from reference [cm$^{-1}$]')
+for i in range(len(pres)):
+    mu[i] -= midpoint*c
+    y = voigt(x, 1, mu[i], sigma[i], gamma[i])
+    plt.plot(x, y/max(y), '-', label = str(pres[i])+' mbar')
+
+plt.xlabel('Laser frequency -'+ str(round(midpoint*c,0)) +'[GHz]')
 plt.ylabel('Intensity [arb. u.]')
-plt.title('Reference = 13085.683 cm$^{-1}$')
-plt.legend(loc=2,fontsize= 'x-small')
+plt.legend(fontsize= 'x-small')
 plt.show()
 plt.close()
 
 
 for i in range(len(mu)):
     mu[i] += midpoint
-    mu[i] *= 29.9792458
-    muerr[i] *= 29.9792458
-    mu[i] -= 39257.25
+    mu[i] *= c
+    muerr[i] *= c
+    mu[i] -= 39257.25*c
+
+ext = np.arange(0,250,10)
 
 fit, err = curve_fit(pol1, pres, mu)
 if fit[1] < 0:
@@ -58,13 +60,14 @@ elif fit[1] == 0:
 else:
     equation1 = 'y = ' + str(round(fit[0],5))+'x +'+str(round(fit[1],3))
 plt.errorbar(pres, mu, yerr=muerr, marker='s', lw = 0, mfc = 'C0')
-plt.plot(pres, pol1(pres, *fit), color = 'C0')
+plt.plot(ext, pol1(ext, *fit), '-', color = 'C0')
 plt.text(x= 125, y=max(mu), s= equation1)
 plt.grid(which='major', axis='both', linewidth=1)
 plt.xlabel('Pressure [mbar]')
 plt.ylabel('Centroid Position [GHz]')
 plt.title('Pressure Shift')
 plt.show()
+print(err[0][0])
 plt.close()
 
 # for i in range(len(fwhm)):
@@ -79,10 +82,11 @@ else:
     equation2 = 'y = ' + str(round(fit2[0],5))+'x +'+str(round(fit2[1],3))
 
 plt.errorbar(pres, fwhm, yerr=fwhmerr, marker='s', lw = 0, mfc = 'C0')
-plt.plot(pres, pol1(pres, *fit2), color = 'C0')
+plt.plot(ext, pol1(ext, *fit2), '-', color = 'C0')
 plt.text(x= 50, y=max(fwhm), s= equation2)
 plt.grid(which='major', axis='both', linewidth=1)
 plt.xlabel('Pressure [mbar]')
 plt.ylabel('Voigt Fit FWHM [GHz]')
 plt.title('Pressure Broadening')
+print(err2[0][0])
 plt.show()
