@@ -50,7 +50,7 @@ plt.rcParams['font.size'] = 18
 minimum = waveno1.min()
 maximum = waveno1.max()
 
-midpoint = 13085.683
+midpoint = 10991.185
 
 for i in range(len(waveno1)):
     waveno1[i] -= midpoint
@@ -58,6 +58,10 @@ for i in range(len(waveno1)):
 # for i in range(len(waveno2)):
 #     waveno2[i] -= midpoint
 
+plt.plot(waveno1, counts1, label=finalname.strip('_fit').replace('_1step', ' 1$^{st}$ step').replace('_2step', ' 2$^{nd}$ step'))
+
+plt.savefig("2step/results/"+finalname+".pdf", bbox_inches = 'tight', pad_inches = 0.1, transparent=True)
+plt.savefig("2step/results/"+finalname+".png", bbox_inches = 'tight', pad_inches = 0.1)
 
 gfit, gerr = curve_fit(gaus, waveno1, counts1, p0 = [600, 0.05, 0.1])
 lfit, lerr = curve_fit(lorentz, waveno1, counts1, p0 = [600, 0.05, 0.1])
@@ -67,7 +71,6 @@ vfit, verr = curve_fit(voigt, waveno1, counts1, p0 = [500, 0.05, 0.01, 0.1])
 # print(waveno1)
 #more format for the plots
 #plt.yscale('log')
-plt.plot(waveno1, counts1, label=in1.strip('gascell.csv').replace('_',' ').replace('1step', '1$^{st}$ step').replace('2step', '2^{nd} step'))
 plt.plot(waveno1, gaus(waveno1, *gfit), '--', color= 'green', label = 'Gauss')
 plt.plot(waveno1, lorentz(waveno1, *lfit), '--', color= 'red', label = 'Lorentz')
 
@@ -102,10 +105,10 @@ meanerr = c*verr[1][1]
 fwhm = (fv)*c
 fwhmerr = errf*c
 
-f = open("results/stats.txt", "a")
-f.write(in1[0]+in1[1]+in1[2] + '\t\t\t\t\t\t' + str(vfit[0]) + '\t' + str(sqrt(verr[0][0])) + '\t' + str(mean) + '\t' + str(meanerr) + '\t' + str(fwhm) + '\t' + str(fwhmerr) + '\t' + str(vfit[2])+ '\t' + str(verr[2][2]) + '\t' + str(vfit[3])+ '\t' + str(verr[3][3]) + '\n')
+f = open("2step/stats2.txt", "a")
+f.write(finalname[0]+finalname[1]+finalname[2] + '\t\t\t\t\t\t' + str(vfit[0]) + '\t' + str(sqrt(verr[0][0])) + '\t' + str(mean) + '\t' + str(meanerr) + '\t' + str(fwhm) + '\t' + str(fwhmerr) + '\t' + str(vfit[2])+ '\t' + str(verr[2][2]) + '\t' + str(vfit[3])+ '\t' + str(verr[3][3]) + '\n')
 #save plot as a pdf (vector images are superior, change my mind) with transparency
-plt.savefig("results/"+finalname+".pdf", bbox_inches = 'tight', pad_inches = 0.1, transparent=True)
-plt.savefig("results/"+finalname+".png", bbox_inches = 'tight', pad_inches = 0.1)
+plt.savefig("2step/results/"+finalname+".pdf", bbox_inches = 'tight', pad_inches = 0.1, transparent=True)
+plt.savefig("2step/results/"+finalname+".png", bbox_inches = 'tight', pad_inches = 0.1)
 plt.close()
 f.close()
