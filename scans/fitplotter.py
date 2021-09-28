@@ -33,36 +33,36 @@ def main(stepno):
 
     plt.rcParams['font.size'] = 18
 
-    midpointwn = 10991.18507 if stepno == 2 else 13085.7509258
+    midpointwn = 10991.18507*2 if stepno == 2 else 13085.7509258*3
     muwn = []
 
     for i in range(len(mu)):
         muwn.append(mu[i] / c -midpointwn)
 
     if stepno == 2:
-        xwn = np.linspace(-0.75,1,10000)
+        xwn = np.linspace(-1,2,10000)
     else:
-        xwn = np.linspace(-0.75,0.5,10000)
+        xwn = np.linspace(-2,2,10000)
     
 
     for i in range(len(pres)):
         y = voigt(xwn, 1, muwn[i], sigma[i], gamma[i])
         plt.plot(xwn, y/max(y), '-', label = str(pres[i])+' mbar')
 
-    plt.xlabel('Laser wavenumber - '+ str(round(midpointwn,1)) +' [cm$^{-1}$]')
+    plt.xlabel('Wavenumber - '+ str(round(midpointwn,1)) +' [cm$^{-1}$]')
     plt.ylabel('Intensity [arb. u.]')
     plt.title('Step '+str(stepno))
     plt.legend(fontsize= 'x-small', bbox_to_anchor = anchor, ncol = legendcols)
-    plt.savefig(str(stepno) + "step/results/allfits"+str(stepno)+"_waveno.pdf", bbox_inches = 'tight', pad_inches = 0.1, transparent=True)
-    plt.savefig(str(stepno) + "step/results/allfits"+str(stepno)+"_waveno.png", bbox_inches = 'tight', pad_inches = 0.1)
+    plt.savefig("fits/allfits"+str(stepno)+"_waveno.pdf", bbox_inches = 'tight', pad_inches = 0.1, transparent=True)
+    plt.savefig("fits/allfits"+str(stepno)+"_waveno.png", bbox_inches = 'tight', pad_inches = 0.1)
     plt.close()
 
     if stepno == 2:
-        midpointfreq = 329507.438834
-        x = np.linspace(3,12,10000)
+        midpointfreq = c*midpointwn
+        x = np.linspace(6,25,10000)
     else:
-        midpointfreq = 392300.943483
-        x = np.linspace(-4.25,-0.75,10000)
+        midpointfreq = c*midpointwn
+        x = np.linspace(-12.5,-2.5,10000)
 
     for i in range(len(pres)):
         mu[i] -= midpointfreq
@@ -70,12 +70,12 @@ def main(stepno):
         y = voigt(x, 1, mu[i], sigma[i], gamma[i])
         plt.plot(x, y/max(y), '-', label = str(pres[i])+' mbar')
 
-    plt.xlabel('Laser frequency - '+ str(round(midpointfreq,1)) +' [GHz]')
+    plt.xlabel('Frequency - '+ str(round(midpointfreq,1)) +' [GHz]')
     plt.title('Step '+str(stepno))
     plt.ylabel('Intensity [arb. u.]')
     plt.legend(fontsize= 'x-small', bbox_to_anchor = anchor, ncol = legendcols)
-    plt.savefig(str(stepno) + "step/results/allfits"+str(stepno)+".pdf", bbox_inches = 'tight', pad_inches = 0.1, transparent=True)
-    plt.savefig(str(stepno) + "step/results/allfits"+str(stepno)+".png", bbox_inches = 'tight', pad_inches = 0.1)
+    plt.savefig("fits/allfits"+str(stepno)+".pdf", bbox_inches = 'tight', pad_inches = 0.1, transparent=True)
+    plt.savefig("fits/allfits"+str(stepno)+".png", bbox_inches = 'tight', pad_inches = 0.1)
     plt.close()
 
 
@@ -87,7 +87,7 @@ def main(stepno):
 
     ext = np.arange(0,250,10)
 
-    fit, err = curve_fit(pol1, pres, mu, sigma = muerr)
+    fit, err = curve_fit(pol1, pres, mu)
     if fit[1] < 0:
         equation1 = 'y = ' + str(round(fit[0],3))+'x '+str(round(fit[1],0))
     elif fit[1] == 0: 
@@ -101,8 +101,8 @@ def main(stepno):
     plt.xlabel('Pressure [mbar]')
     plt.ylabel('Centroid Position \n- '+ str(round(midpointfreq*1000,0)) +'  [MHz]')
     plt.title('Pressure Shift - Step ' + str(stepno))
-    plt.savefig(str(stepno) + "step/results/shift"+str(stepno)+".pdf", bbox_inches = 'tight', pad_inches = 0.1, transparent=True)
-    plt.savefig(str(stepno) + "step/results/shift"+str(stepno)+".png", bbox_inches = 'tight', pad_inches = 0.1)
+    plt.savefig("fits/shift"+str(stepno)+".pdf", bbox_inches = 'tight', pad_inches = 0.1, transparent=True)
+    plt.savefig("fits/shift"+str(stepno)+".png", bbox_inches = 'tight', pad_inches = 0.1)
     print("Shift = ", fit[0], sqrt(err[0][0]))
     plt.close()
 
@@ -130,8 +130,8 @@ def main(stepno):
     plt.title('Pressure Broadening - Step ' + str(stepno))
     print("Broadening = ", fit2[0], sqrt(err2[0][0]))
     print("Width in Vacuum = ", fit2[1], sqrt(err2[1][1]))
-    plt.savefig(str(stepno) + "step/results/broadening"+str(stepno)+".pdf", bbox_inches = 'tight', pad_inches = 0.1, transparent=True)
-    plt.savefig(str(stepno) + "step/results/broadening"+str(stepno)+".png", bbox_inches = 'tight', pad_inches = 0.1)
+    plt.savefig("fits/broadening"+str(stepno)+".pdf", bbox_inches = 'tight', pad_inches = 0.1, transparent=True)
+    plt.savefig("fits/broadening"+str(stepno)+".png", bbox_inches = 'tight', pad_inches = 0.1)
     plt.close()
 
 for stepno in [1,2]:
