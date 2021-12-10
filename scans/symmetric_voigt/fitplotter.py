@@ -87,7 +87,7 @@ def main(stepno):
 
     ext = np.arange(0,250,10)
 
-    fit, err = curve_fit(pol1, pres, mu)
+    fit, err = curve_fit(pol1, pres, mu, absolute_sigma=False)
     if fit[1] < 0:
         equation1 = 'y = ' + str(round(fit[0],3))+'x '+str(round(fit[1],0))
     elif fit[1] == 0: 
@@ -101,15 +101,15 @@ def main(stepno):
     plt.xlabel('Pressure [mbar]')
     plt.ylabel('Centroid Position \n- '+ str(round(midpointfreq*1000,0)) +'  [MHz]')
     plt.title('Pressure Shift - Step ' + str(stepno))
-    plt.savefig("fits/shift"+str(stepno)+".pdf", bbox_inches = 'tight', pad_inches = 0.1, transparent=True)
-    plt.savefig("fits/shift"+str(stepno)+".png", bbox_inches = 'tight', pad_inches = 0.1)
+    plt.savefig("fits/shift"+str(stepno)+"_sigma.pdf", bbox_inches = 'tight', pad_inches = 0.1, transparent=True)
+    plt.savefig("fits/shift"+str(stepno)+"_sigma.png", bbox_inches = 'tight', pad_inches = 0.1)
     print("Shift = ", fit[0], sqrt(err[0][0]))
     plt.close()
 
     # for i in range(len(fwhm)):
     #     fwhm[i] = abs(fwhm[0] - fwhm[i])
 
-    fit2, err2 = curve_fit(pol1, pres, fwhm)
+    fit2, err2 = curve_fit(pol1, pres, fwhm, absolute_sigma=False)
     if fit2[1] < 0:
         equation2 = 'y = ' + str(round(fit2[0],2))+'x '+str(round(fit2[1],3))
     elif fit2[1] == 0: 
@@ -130,8 +130,8 @@ def main(stepno):
     plt.title('Pressure Broadening - Step ' + str(stepno))
     print("Broadening = ", fit2[0], sqrt(err2[0][0]))
     print("Width in Vacuum = ", fit2[1], sqrt(err2[1][1]))
-    plt.savefig("fits/broadening"+str(stepno)+".pdf", bbox_inches = 'tight', pad_inches = 0.1, transparent=True)
-    plt.savefig("fits/broadening"+str(stepno)+".png", bbox_inches = 'tight', pad_inches = 0.1)
+    plt.savefig("fits/broadening"+str(stepno)+"_sigma.pdf", bbox_inches = 'tight', pad_inches = 0.1, transparent=True)
+    plt.savefig("fits/broadening"+str(stepno)+"_sigma.png", bbox_inches = 'tight', pad_inches = 0.1)
     plt.close()
 
 for stepno in [1,2]:
