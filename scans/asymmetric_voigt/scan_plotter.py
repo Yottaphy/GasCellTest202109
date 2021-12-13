@@ -1,3 +1,4 @@
+from statistics import mode
 import numpy as np
 from numpy.lib.scimath import log, sqrt
 import scipy as sc
@@ -21,7 +22,7 @@ def txtreader(filename):
     return x,y
 def txtreader2(filename):
     a,cts,b,c,wvno,d,e,f,g,h,i,j= np.genfromtxt( filename, unpack= True, delimiter=',', skip_header=1)
-    return cts,wvno
+    return wvno, cts
 
 
 #read 3 columns in order
@@ -53,11 +54,10 @@ elif stepno == '1':
         freq.append(3*c*waveno[i])
         freq[i] -= midpoint
 
-
 plt.plot(freq, counts, 'o', markersize=2,  label=finalname.strip('_fit').replace('_1step', ' 1$^{st}$ step').replace('_2step', ' 2$^{nd}$ step'))
 
 svm = SkewedVoigtModel()
-params = svm.make_params(amplitude=600, center=0, sigma=150, gamma=130, skew=5)
+params = svm.make_params(amplitude=600, center=-10, sigma=150, gamma=130, skew=5)
 
 result = svm.fit(counts, params, x= freq)
 
@@ -89,15 +89,30 @@ F3   = 5.545083
 fwhm = F1*g + sqrt(F2*g**2 + F3*s**2)
 fwhmerr = sqrt((gerr*(F1+F2*g/(fwhm-F1*g)))**2 + (serr*s*F3/(fwhm-F1*g))**2)
     
+mu = result.params['center'].value
+muerr = result.params['center'].stderr
+skew = result.params['skew'].value
+skewerr = result.params['skew'].stderr
+
+centre = freq[result.best_fit.argmax()] 
+centreerr = muerr
+
 # f.write(finalname[0]+finalname[1]+finalname[2] + '\t\t\t\t\t\t' + str(result) + '\t' + str(sqrt(verr[0][0])) + '\t' + str(mean) + '\t' + str(meanerr) + '\t' + str(fwhm) + '\t' + str(fwhmerr) + '\t' + str(vfit[2])+ '\t' + str(verr[2][2]) + '\t' + str(vfit[3])+ '\t' + str(verr[3][3]) + '\n')
-f.write(finalname[0]+finalname[1]+finalname[2] + '\t\t\t\t\t\t' + str(result.params['center'].value) +'\t'+ str(result.params['center'].stderr) +'\t'+ str(fwhm)+'\t'+ str(fwhmerr)+'\n')
+f.write(finalname[0]+finalname[1]+finalname[2] + '\t\t\t\t\t\t' + str(centre) +'\t'+ str(centreerr) +'\t'+ str(fwhm)+'\t'+ str(fwhmerr)+'\n')
+
+
+#plt.vlines(centre,0,500)
+#plt.axvspan(freq[result.best_fit.argmax() -1], freq[result.best_fit.argmax()+2], color='red')
 
 
 #save plot as a pdf (vector images are superior, change my mind) with transparency
-if stepno == 2:
+if stepno == 'feb':
+    plt.savefig("feb/results/"+finalname+"_asym.pdf", bbox_inches = 'tight', pad_inches = 0.1, transparent=True)
+    plt.savefig("feb/results/"+finalname+"_asym.png", bbox_inches = 'tight', pad_inches = 0.1)
+if stepno == '2':
     plt.savefig("2step/results/"+finalname+"_asym.pdf", bbox_inches = 'tight', pad_inches = 0.1, transparent=True)
     plt.savefig("2step/results/"+finalname+"_asym.png", bbox_inches = 'tight', pad_inches = 0.1)
-elif stepno == 1:
+elif stepno == '1':
     plt.savefig("1step/results/"+finalname+"_asym.pdf", bbox_inches = 'tight', pad_inches = 0.1, transparent=True)
     plt.savefig("1step/results/"+finalname+"_asym.png", bbox_inches = 'tight', pad_inches = 0.1)
 

@@ -28,17 +28,17 @@ def main(stepno):
     anchor = (1,1)
     legendcols = 1
 
-    pres, mu, muerr, fwhm, fwhmerr = txtreader(str(stepno) + "step/stats"+str(stepno)+"_asym.txt")
+    pres, mu, muerr, fwhm, fwhmerr = txtreader(stepno + "/stats"+str(stepno)+"_asym.txt")
 
     plt.rcParams['font.size'] = 18
     
-    midpoint = c*1E7/454.91 if stepno == 2 else c*1E7/254.73
+    midpoint = c*1E7/254.73 if stepno == '1step' else c*1E7/454.91
 
     ext = np.arange(0,250,0.1)
 
     linfit = Model(pol1)
     params = linfit.make_params(m = -1, c = 0)
-    shift = linfit.fit(mu, params, x= pres, weights= 1/muerr**2)
+    shift = linfit.fit(mu, params, x= pres)
     shift_trend = shift.eval(shift.params, x=ext)
 
     equation_shift = '$\mu$ = ' + str(round(shift.params['m'].value, 4)) + 'P + ' + str(round(shift.params['c'].value,4))
@@ -52,7 +52,7 @@ def main(stepno):
     plt.xlim(0,250)
     plt.xlabel('Pressure [mbar]')
     plt.ylabel('Centroid Position \n- '+ str(round(midpoint)) +'  [GHz]')
-    plt.title('Pressure Shift - Step ' + str(stepno))
+    plt.title('Pressure Shift - ' + str(stepno))
     plt.savefig("fits/shift"+str(stepno)+"_asym.pdf", bbox_inches = 'tight', pad_inches = 0.1, transparent=True)
     plt.savefig("fits/shift"+str(stepno)+"_asym.png", bbox_inches = 'tight', pad_inches = 0.1)
     print("Shift = ", 1000*shift.params['m'].value, 1000*shift.params['m'].stderr)
@@ -65,19 +65,19 @@ def main(stepno):
 
     plt.errorbar(pres, fwhm, yerr=fwhmerr, marker='s', lw = 0, mfc = 'C0', ecolor = 'C0', elinewidth = 2)
     plt.plot(ext, broadening_trend, '-', color = 'red')
-    plt.text(x= 10, y=max(fwhm)+5, s= equation_broad)
+    plt.text(x= 10, y=max(fwhm)+2, s= equation_broad)
     #plt.grid(which='major', axis='both', linewidth=1)
     plt.minorticks_on()
     plt.tick_params(axis='both', which='both', top=True, right=True, direction='in')
     plt.xlim(0,250)
     plt.xlabel('Pressure [mbar]')
     plt.ylabel('Voigt Fit FWHM [MHz]')
-    plt.title('Pressure Broadening - Step ' + str(stepno))
+    plt.title('Pressure Broadening - ' + str(stepno))
     print("Broadening = ", 1000*broadening.params['m'].value, 1000*broadening.params['m'].stderr)
     print("Width in Vacuum = ", broadening.params['c'].value, broadening.params['c'].stderr)
     plt.savefig("fits/broadening"+str(stepno)+"_asym.pdf", bbox_inches = 'tight', pad_inches = 0.1, transparent=True)
     plt.savefig("fits/broadening"+str(stepno)+"_asym.png", bbox_inches = 'tight', pad_inches = 0.1)
     plt.close()
 
-for stepno in [1,2]:
+for stepno in ['1step','2step', 'feb']:
     main(stepno)

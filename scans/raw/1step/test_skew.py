@@ -110,7 +110,7 @@ data = sat.Source(data[:, 0], data[:, 1], yerr=modifiedSqrt, name='mbar50')
 f.addSource(data)
 
 # voigt = sat.Voigt(600, 1000, 500, 500, name='Symmetric_Peak')
-voigt = sat.SkewedVoigt(600, 1000, 500, 500, 0, name='Asymmetric_Peak')
+voigt = sat.SkewedVoigtModel(600, 1000, 500, 500, 0, name='Asymmetric_Peak')
 voigt.setVary('Skew', True)
 data.addModel(voigt)
 background = sat.Polynomial([30], name='Background')
