@@ -19,13 +19,17 @@ c = 29.9792458 #cm/ns
 def txtreader(filename):
     x,y,z = np.genfromtxt( filename, unpack= True, delimiter=',', skip_header=1)
     return x,y
+def txtreader2(filename):
+    a,cts,b,c,wvno,d,e,f,g,h,i,j= np.genfromtxt( filename, unpack= True, delimiter=',', skip_header=1)
+    return cts,wvno
 
 
 #read 3 columns in order
 in1       = sys.argv[1]
 finalname = sys.argv[2]
-stepno    = int(sys.argv[3])
-waveno, counts = txtreader(in1)
+stepno    = sys.argv[3]
+# waveno, counts = txtreader(in1)
+waveno, counts = txtreader2(in1)
 
 #define some nicer format for the plots
 plt.rcParams['font.size'] = 18
@@ -38,12 +42,12 @@ minimum = waveno.min()
 maximum = waveno.max()
 freq =[]
 
-if stepno == 2:
+if stepno == '2' or stepno == 'feb':
     midpoint = c*1E7/454.91
     for i in range(len(waveno)):
         freq.append(2*c*waveno[i])
         freq[i] -= midpoint
-elif stepno == 1:
+elif stepno == '1':
     midpoint = c*1E7/254.73
     for i in range(len(waveno)):
         freq.append(3*c*waveno[i])
@@ -66,16 +70,18 @@ plt.xlabel('Frequency - '+str(round(midpoint))+' [GHz]')
 plt.legend(loc=2,fontsize= 'x-small')
 # plt.yscale("log")
 
-if stepno==2:
+if stepno=='2':
     f = open("2step/stats2_asym.txt", "a")
-elif stepno == 1:
+elif stepno == '1':
     f = open("1step/stats1_asym.txt", "a")
+elif stepno == 'feb':
+    f = open("feb/statsfeb_asym.txt", "a")
 
-g    = (result.params['gamma'].value)
-gerr = (result.params['gamma'].stderr)
+g    = result.params['gamma'].value
+gerr = result.params['gamma'].stderr
 
-s    = (result.params['sigma'].value)
-serr = (result.params['sigma'].stderr)
+s    = result.params['sigma'].value
+serr = result.params['sigma'].stderr
 
 F1   = 1.0692
 F2   = 0.8664
