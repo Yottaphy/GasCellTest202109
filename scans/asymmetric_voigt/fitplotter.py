@@ -71,7 +71,7 @@ def main(stepno):
     plt.tick_params(axis='both', which='both', top=True, right=True, direction='in')
     plt.xlim(0,250)
     plt.xlabel('Pressure [mbar]')
-    plt.ylabel('Voigt Fit FWHM [MHz]')
+    plt.ylabel('Voigt Fit FWHM [GHz]')
     plt.title('Pressure Broadening - ' + str(stepno))
     print("Broadening = ", 1000*broadening.params['m'].value, 1000*broadening.params['m'].stderr)
     print("Width in Vacuum = ", broadening.params['c'].value, broadening.params['c'].stderr)
